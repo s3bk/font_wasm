@@ -1,0 +1,17 @@
+[package]
+name = "font_wasm"
+version = "0.1.0"
+authors = ["Sebastian Köln <sebk@rynx.org>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+font = { path = "../font" }
+vector = { git = "https://github.com/s3bk/vector/" }
+wasm-bindgen = "*"
+raqote = { version = "*", default-features = false }
+wee_alloc = "*"
+pathfinder_content = { git = "https://github.com/s3bk/pathfinder/" }
