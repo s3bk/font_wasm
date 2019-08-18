@@ -38,9 +38,9 @@ function draw_text(font, text) {
 }
 
 function update_text(e) {
-    let text = e.target.value;
+    TEXT = e.target.value;
     ENTRIES.forEach(function(entry) {
-        let canvas = draw_text(entry.font, text);
+        let canvas = draw_text(entry.font, TEXT);
         let div = entry.div;
         div.replaceChild(canvas, div.firstChild);
     });
