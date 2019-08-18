@@ -80,30 +80,15 @@ export function main() {
     wasm.main();
 }
 
-let cachedTextDecoder = new TextDecoder('utf-8');
-
-function getStringFromWasm(ptr, len) {
-    return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-}
-
 const heap = new Array(32);
 
 heap.fill(undefined);
 
 heap.push(undefined, null, true, false);
 
-let heap_next = heap.length;
-
-function addHeapObject(obj) {
-    if (heap_next === heap.length) heap.push(heap.length + 1);
-    const idx = heap_next;
-    heap_next = heap[idx];
-
-    heap[idx] = obj;
-    return idx;
-}
-
 function getObject(idx) { return heap[idx]; }
+
+let heap_next = heap.length;
 
 function dropObject(idx) {
     if (idx < 36) return;
@@ -119,6 +104,25 @@ function takeObject(idx) {
 
 function getArrayU8FromWasm(ptr, len) {
     return getUint8Memory().subarray(ptr / 1, ptr / 1 + len);
+}
+
+function addHeapObject(obj) {
+    if (heap_next === heap.length) heap.push(heap.length + 1);
+    const idx = heap_next;
+    heap_next = heap[idx];
+
+    heap[idx] = obj;
+    return idx;
+}
+
+function handleError(e) {
+    wasm.__wbindgen_exn_store(addHeapObject(e));
+}
+
+let cachedTextDecoder = new TextDecoder('utf-8');
+
+function getStringFromWasm(ptr, len) {
+    return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
 }
 /**
 */
@@ -208,26 +212,28 @@ function init(module) {
     let result;
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbg_new_9e5262d219d2ab81 = function(arg0, arg1) {
-        const ret = new Function(getStringFromWasm(arg0, arg1));
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_call_9d76dec92c7e03fd = function(arg0, arg1) {
-        const ret = getObject(arg0).call(getObject(arg1));
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
-    imports.wbg.__wbindgen_jsval_eq = function(arg0, arg1) {
-        const ret = getObject(arg0) === getObject(arg1);
-        return ret;
+    imports.wbg.__wbg_randomFillSync_4c0eae1b99ed88f0 = function(arg0, arg1, arg2) {
+        getObject(arg0).randomFillSync(getArrayU8FromWasm(arg1, arg2));
     };
-    imports.wbg.__wbg_self_be54a55a10c6aca2 = function(arg0) {
-        const ret = getObject(arg0).self;
+    imports.wbg.__wbg_getRandomValues_d2d716c4a01068d2 = function(arg0, arg1, arg2) {
+        getObject(arg0).getRandomValues(getArrayU8FromWasm(arg1, arg2));
+    };
+    imports.wbg.__wbg_self_5aab2143078661ea = function() {
+        try {
+            const ret = self.self;
+            return addHeapObject(ret);
+        } catch (e) {
+            handleError(e)
+        }
+    };
+    imports.wbg.__wbg_require_52205ce70149088f = function(arg0, arg1) {
+        const ret = require(getStringFromWasm(arg0, arg1));
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_crypto_f6e4a8333f296b80 = function(arg0) {
+    imports.wbg.__wbg_crypto_bb3540e125106826 = function(arg0) {
         const ret = getObject(arg0).crypto;
         return addHeapObject(ret);
     };
@@ -235,19 +241,9 @@ function init(module) {
         const ret = getObject(arg0) === undefined;
         return ret;
     };
-    imports.wbg.__wbg_getRandomValues_565baea101aa0f78 = function(arg0) {
+    imports.wbg.__wbg_getRandomValues_bda9b45cd5361a25 = function(arg0) {
         const ret = getObject(arg0).getRandomValues;
         return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_require_4552fe1e0abcb7e5 = function(arg0, arg1) {
-        const ret = require(getStringFromWasm(arg0, arg1));
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_getRandomValues_d12e9fc437d4f537 = function(arg0, arg1, arg2) {
-        getObject(arg0).getRandomValues(getArrayU8FromWasm(arg1, arg2));
-    };
-    imports.wbg.__wbg_randomFillSync_39ff05f18e54e0fc = function(arg0, arg1, arg2) {
-        getObject(arg0).randomFillSync(getArrayU8FromWasm(arg1, arg2));
     };
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm(arg0, arg1));
