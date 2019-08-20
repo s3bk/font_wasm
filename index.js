@@ -11,6 +11,7 @@ const rust = import('./pkg/font_wasm.js')
 let ENTRIES = [];
 let TEXT = "Hello World!";
 
+
 function load_font_from_url(url) {
     fetch(url)
         .then(r => r.arrayBuffer())
