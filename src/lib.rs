@@ -7,6 +7,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 use wasm_bindgen::prelude::*;
 use font::{Font, parse, draw_text};
 use raqote::{DrawTarget, Path};
+use vector::PathStyle;
 
 #[wasm_bindgen]
 extern "C" {
@@ -36,8 +37,16 @@ impl FontRef {
     }
     
     pub fn draw_text(&self, font_size: f32, text: &str) -> Image {
+        let glyph_style = PathStyle {
+            fill: Some((0, 0, 255, 100)),
+            stroke: Some(((0, 0, 0, 255), 0.05))
+        };
+        let baseline_style = PathStyle {
+            fill: None,
+            stroke: Some(((0, 0, 0, 255), 0.05))
+        };
         Image {
-            data: draw_text::<DrawTarget>(&*self.raqote, font_size, text)
+            data: draw_text::<DrawTarget>(&*self.raqote, font_size, text, glyph_style, Some(baseline_style))
         }
     }
 }
