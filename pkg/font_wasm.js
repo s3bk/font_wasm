@@ -193,11 +193,11 @@ export class Image {
     /**
     * @param {Uint8Array} buffer
     */
-    get_data(buffer) {
+    write_rgba_to(buffer) {
         const ptr0 = passArray8ToWasm(buffer);
         const len0 = WASM_VECTOR_LEN;
         try {
-            wasm.image_get_data(this.ptr, ptr0, len0);
+            wasm.image_write_rgba_to(this.ptr, ptr0, len0);
         } finally {
             buffer.set(getUint8Memory().subarray(ptr0 / 1, ptr0 / 1 + len0));
             wasm.__wbindgen_free(ptr0, len0 * 1);

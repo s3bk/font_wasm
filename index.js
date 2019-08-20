@@ -51,8 +51,9 @@ function image2canvas(image) {
     let width = canvas.width = image.width();
     let height = canvas.height = image.height();
     let ctx = canvas.getContext('2d');
-    var img_data = ctx.createImageData(canvas.width, canvas.height);
-    image.get_data(img_data.data);
+    let array = new Uint8ClampedArray(4 * width * height);
+    image.write_rgba_to(array);
+    var img_data = new ImageData(array, width, height);
     ctx.putImageData(img_data,0,0);
     return canvas;
 }
