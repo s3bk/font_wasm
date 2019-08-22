@@ -5,7 +5,7 @@ extern crate wee_alloc;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 use wasm_bindgen::prelude::*;
-use font::{Font, parse, draw_text};
+use font::{Font, parse, layout::line};
 use raqote::{DrawTarget, Path};
 use vector::PathStyle;
 
@@ -46,7 +46,7 @@ impl FontRef {
             stroke: Some(((0, 0, 0, 255), 0.5))
         };
         Image {
-            data: draw_text::<DrawTarget>(&*self.raqote, font_size, text, glyph_style, Some(baseline_style))
+            data: line::<DrawTarget>(&*self.raqote, font_size, text, glyph_style, Some(baseline_style))
         }
     }
 }

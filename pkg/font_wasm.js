@@ -1,90 +1,91 @@
+(function() {
+    const __exports = {};
+    let wasm;
 
-let wasm;
-
-let cachegetUint8Memory = null;
-function getUint8Memory() {
-    if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
-        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
+    let cachegetUint8Memory = null;
+    function getUint8Memory() {
+        if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
+            cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
+        }
+        return cachegetUint8Memory;
     }
-    return cachegetUint8Memory;
-}
 
-let WASM_VECTOR_LEN = 0;
+    let WASM_VECTOR_LEN = 0;
 
-function passArray8ToWasm(arg) {
-    const ptr = wasm.__wbindgen_malloc(arg.length * 1);
-    getUint8Memory().set(arg, ptr / 1);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
-}
-
-let cachedTextEncoder = new TextEncoder('utf-8');
-
-let passStringToWasm;
-if (typeof cachedTextEncoder.encodeInto === 'function') {
-    passStringToWasm = function(arg) {
-
-
-        let size = arg.length;
-        let ptr = wasm.__wbindgen_malloc(size);
-        let offset = 0;
-        {
-            const mem = getUint8Memory();
-            for (; offset < arg.length; offset++) {
-                const code = arg.charCodeAt(offset);
-                if (code > 0x7F) break;
-                mem[ptr + offset] = code;
-            }
-        }
-
-        if (offset !== arg.length) {
-            arg = arg.slice(offset);
-            ptr = wasm.__wbindgen_realloc(ptr, size, size = offset + arg.length * 3);
-            const view = getUint8Memory().subarray(ptr + offset, ptr + size);
-            const ret = cachedTextEncoder.encodeInto(arg, view);
-
-            offset += ret.written;
-        }
-        WASM_VECTOR_LEN = offset;
+    function passArray8ToWasm(arg) {
+        const ptr = wasm.__wbindgen_malloc(arg.length * 1);
+        getUint8Memory().set(arg, ptr / 1);
+        WASM_VECTOR_LEN = arg.length;
         return ptr;
-    };
-} else {
-    passStringToWasm = function(arg) {
+    }
+
+    let cachedTextEncoder = new TextEncoder('utf-8');
+
+    let passStringToWasm;
+    if (typeof cachedTextEncoder.encodeInto === 'function') {
+        passStringToWasm = function(arg) {
 
 
-        let size = arg.length;
-        let ptr = wasm.__wbindgen_malloc(size);
-        let offset = 0;
-        {
-            const mem = getUint8Memory();
-            for (; offset < arg.length; offset++) {
-                const code = arg.charCodeAt(offset);
-                if (code > 0x7F) break;
-                mem[ptr + offset] = code;
+            let size = arg.length;
+            let ptr = wasm.__wbindgen_malloc(size);
+            let offset = 0;
+            {
+                const mem = getUint8Memory();
+                for (; offset < arg.length; offset++) {
+                    const code = arg.charCodeAt(offset);
+                    if (code > 0x7F) break;
+                    mem[ptr + offset] = code;
+                }
             }
-        }
 
-        if (offset !== arg.length) {
-            const buf = cachedTextEncoder.encode(arg.slice(offset));
-            ptr = wasm.__wbindgen_realloc(ptr, size, size = offset + buf.length);
-            getUint8Memory().set(buf, ptr + offset);
-            offset += buf.length;
-        }
-        WASM_VECTOR_LEN = offset;
-        return ptr;
+            if (offset !== arg.length) {
+                arg = arg.slice(offset);
+                ptr = wasm.__wbindgen_realloc(ptr, size, size = offset + arg.length * 3);
+                const view = getUint8Memory().subarray(ptr + offset, ptr + size);
+                const ret = cachedTextEncoder.encodeInto(arg, view);
+
+                offset += ret.written;
+            }
+            WASM_VECTOR_LEN = offset;
+            return ptr;
+        };
+    } else {
+        passStringToWasm = function(arg) {
+
+
+            let size = arg.length;
+            let ptr = wasm.__wbindgen_malloc(size);
+            let offset = 0;
+            {
+                const mem = getUint8Memory();
+                for (; offset < arg.length; offset++) {
+                    const code = arg.charCodeAt(offset);
+                    if (code > 0x7F) break;
+                    mem[ptr + offset] = code;
+                }
+            }
+
+            if (offset !== arg.length) {
+                const buf = cachedTextEncoder.encode(arg.slice(offset));
+                ptr = wasm.__wbindgen_realloc(ptr, size, size = offset + buf.length);
+                getUint8Memory().set(buf, ptr + offset);
+                offset += buf.length;
+            }
+            WASM_VECTOR_LEN = offset;
+            return ptr;
+        };
+    }
+    /**
+    */
+    __exports.main = function() {
+        wasm.main();
     };
-}
-/**
-*/
-export function main() {
-    wasm.main();
-}
 
-const heap = new Array(32);
+    const heap = new Array(32);
 
-heap.fill(undefined);
+    heap.fill(undefined);
 
-heap.push(undefined, null, true, false);
+    heap.push(undefined, null, true, false);
 
 function getObject(idx) { return heap[idx]; }
 
@@ -126,7 +127,7 @@ function getStringFromWasm(ptr, len) {
 }
 /**
 */
-export class FontRef {
+class FontRef {
 
     static __wrap(ptr) {
         const obj = Object.create(FontRef.prototype);
@@ -159,9 +160,10 @@ export class FontRef {
         return Image.__wrap(ret);
     }
 }
+__exports.FontRef = FontRef;
 /**
 */
-export class Image {
+class Image {
 
     static __wrap(ptr) {
         const obj = Object.create(Image.prototype);
@@ -204,11 +206,10 @@ export class Image {
         }
     }
 }
+__exports.Image = Image;
 
 function init(module) {
-    if (typeof module === 'undefined') {
-        module = import.meta.url.replace(/\.js$/, '_bg.wasm');
-    }
+
     let result;
     const imports = {};
     imports.wbg = {};
@@ -290,5 +291,6 @@ function init(module) {
     });
 }
 
-export default init;
+self.wasm_bindgen = Object.assign(init, __exports);
 
+})();

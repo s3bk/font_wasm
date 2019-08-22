@@ -1,61 +1,80 @@
-let M; 
+let worker = new Worker('worker.js');
+let running = {};
+let job_nr = 0;
 
-const rust = import('./pkg/font_wasm.js')
-    .then(function(module) {
-        M = module;
-        return module.default();
-    }).then(function() {
-        load_font_from_url("Roboto-Medium.ttf");
+function run(method, args, callback) {
+    let id = job_nr;
+    job_nr += 1;
+    
+    if (callback) {
+        running[id] = callback;
+    }
+    worker.postMessage({
+        id: id,
+        method: method,
+        args: args
     });
+}
+worker.onmessage = function(e) {
+    let msg = e.data;
+    console.log(msg);
+    let id = msg.id;
+    let callback = running[id];
+    delete running[id];
+    
+    if (callback != undefined) {
+        callback(msg.data);
+    }
+}
+
+load_font_from_url("Roboto-Medium.ttf");
 
 let ENTRIES = [];
 let TEXT = "Hello World!";
 
 
-function load_font_from_url(url) {
-    fetch(url)
-        .then(r => r.arrayBuffer())
-        .then(load_font, url);
+async function load_font_from_url(url) {
+    let response = await fetch(url);
+    let data = await response.arrayBuffer();
+    load_font(data, url);
 }
 
-function load_font(data, name) {
-    let font = new M.FontRef(new Uint8Array(data));
+function load_font(data, font_id) {
     let div = document.createElement("div");
-    let canvas = draw_text(font, TEXT);
-    div.appendChild(canvas);
+    
+    run("load_font", {font_id: font_id, data: data});
+    run("draw_text", {font_id: font_id, text: TEXT}, function(image) {
+        div.appendChild(image2canvas(image));
+        
+        let label = document.createElement("span");
+        label.appendChild(document.createTextNode(font_id));
+        div.appendChild(label);
+    });
+    
     let entry = {
-        name: name,
-        font: font,
+        font_id: font_id,
         div: div
     };
     document.getElementById("views").append(div);
     ENTRIES.push(entry);
 }
-        
-function draw_text(font, text) {
-    let image = font.draw_text(100, text);
-    let canvas = image2canvas(image);
-    return canvas;
-}
 
 function update_text(e) {
     TEXT = e.target.value;
     ENTRIES.forEach(function(entry) {
-        let canvas = draw_text(entry.font, TEXT);
-        let div = entry.div;
-        div.replaceChild(canvas, div.firstChild);
+        run("draw_text", {font_id: entry.font_id, text: TEXT}, function(image) {
+            let div = entry.div;
+            div.replaceChild(image2canvas(image), div.firstChild);
+        });
     });
 }
         
 function image2canvas(image) {
     let canvas = document.createElement("canvas");
-    let width = canvas.width = image.width();
-    let height = canvas.height = image.height();
+    let width = canvas.width = image.width;
+    let height = canvas.height = image.height;
     let ctx = canvas.getContext('2d');
-    let array = new Uint8ClampedArray(4 * width * height);
-    image.write_rgba_to(array);
-    var img_data = new ImageData(array, width, height);
-    ctx.putImageData(img_data,0,0);
+    ctx.drawImage(image, 0, 0);
     return canvas;
 }
 function add_fonts(files) {

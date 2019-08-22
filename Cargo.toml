@@ -15,3 +15,6 @@ wasm-bindgen = "*"
 raqote = { version = "*", default-features = false }
 wee_alloc = "*"
 pathfinder_content = { git = "https://github.com/s3bk/pathfinder/" }
+
+[patch."https://github.com/s3bk/vector/"]
+vector = { path = "../vector" }
