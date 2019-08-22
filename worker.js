@@ -48,13 +48,9 @@ function Context() {
             }, [image_bitmap]));
         },
         create_style: function(post, args) {
-            let style = new wasm_bindgen.Style();
+            let style = new wasm_bindgen.Style(args.json);
             this.styles[args.style_id] = style;
         },
-        update_style: function(post, args) {
-            let style = this.styles[args.style_id];
-            style.update(args.json);
-        }
     };
     this.onmessage = function(e) {
         let msg = e.data;

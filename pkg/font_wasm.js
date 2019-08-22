@@ -233,17 +233,12 @@ class Style {
         wasm.__wbg_style_free(ptr);
     }
     /**
+    * @param {string} json
     * @returns {Style}
     */
-    constructor() {
-        const ret = wasm.style_new();
+    constructor(json) {
+        const ret = wasm.style_new(passStringToWasm(json), WASM_VECTOR_LEN);
         return Style.__wrap(ret);
-    }
-    /**
-    * @param {string} json
-    */
-    update(json) {
-        wasm.style_update(this.ptr, passStringToWasm(json), WASM_VECTOR_LEN);
     }
 }
 __exports.Style = Style;

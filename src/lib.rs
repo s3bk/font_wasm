@@ -15,13 +15,13 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 struct StrokeStyle {
-    color: [u8; 3],
+    color: [f32; 3],
     opacity: f32,
     width: f32
 }
 #[derive(Deserialize)]
 struct FillStyle {
-    color: [u8; 3],
+    color: [f32; 3],
     opacity: f32
 }
 impl Into<(Rgba8, f32)> for StrokeStyle {
@@ -42,10 +42,10 @@ struct Settings {
     stroke: Option<StrokeStyle>,
     baseline: Option<StrokeStyle>
 }
-fn rgba_from_color_and_opacity(color: [u8; 3], opacity: f32) -> Rgba8 {
+fn rgba_from_color_and_opacity(color: [f32; 3], opacity: f32) -> Rgba8 {
     let [r, g, b] = color;
     let a = (255. * opacity) as u8;
-    (r, g, b, a)
+    (r as u8, g as u8, b as u8, a)
 }
 
 #[wasm_bindgen]
@@ -85,18 +85,9 @@ impl From<Settings> for Style {
 #[wasm_bindgen]
 impl Style {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Style {
-        Settings {
-            font_size: 100.,
-            fill: None,
-            stroke: None,
-            baseline: None
-        }.into()
-    }
-    
-    pub fn update(&mut self, json: &str) {
+    pub fn new(json: &str) -> Style {
         let settings: Settings = serde_json::from_str(json).unwrap();
-        *self = settings.into();
+        settings.into()
     }
 }
 

@@ -168,10 +168,9 @@ function update_style() {
     if (settings.baseline.enabled) {
         style.baseline = settings.baseline;
     }
-    run("update_style", { style_id: STYLE, json: JSON.stringify(style) });
+    run("create_style", { style_id: STYLE, json: JSON.stringify(style) });
     update_all();
 }
-run("create_style", { style_id: STYLE });
 
 function init() {
     init_dat();
