@@ -2,6 +2,10 @@
     const __exports = {};
     let wasm;
 
+    let WASM_VECTOR_LEN = 0;
+
+    let cachedTextEncoder = new TextEncoder('utf-8');
+
     let cachegetUint8Memory = null;
     function getUint8Memory() {
         if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
@@ -9,17 +13,6 @@
         }
         return cachegetUint8Memory;
     }
-
-    let WASM_VECTOR_LEN = 0;
-
-    function passArray8ToWasm(arg) {
-        const ptr = wasm.__wbindgen_malloc(arg.length * 1);
-        getUint8Memory().set(arg, ptr / 1);
-        WASM_VECTOR_LEN = arg.length;
-        return ptr;
-    }
-
-    let cachedTextEncoder = new TextEncoder('utf-8');
 
     let passStringToWasm;
     if (typeof cachedTextEncoder.encodeInto === 'function') {
@@ -74,6 +67,20 @@
             WASM_VECTOR_LEN = offset;
             return ptr;
         };
+    }
+
+    function passArray8ToWasm(arg) {
+        const ptr = wasm.__wbindgen_malloc(arg.length * 1);
+        getUint8Memory().set(arg, ptr / 1);
+        WASM_VECTOR_LEN = arg.length;
+        return ptr;
+    }
+
+    function _assertClass(instance, klass) {
+        if (!(instance instanceof klass)) {
+            throw new Error(`expected instance of ${klass.name}`);
+        }
+        return instance.ptr;
     }
     /**
     */
@@ -151,12 +158,13 @@ class FontRef {
         return FontRef.__wrap(ret);
     }
     /**
-    * @param {number} font_size
     * @param {string} text
+    * @param {Style} style
     * @returns {Image}
     */
-    draw_text(font_size, text) {
-        const ret = wasm.fontref_draw_text(this.ptr, font_size, passStringToWasm(text), WASM_VECTOR_LEN);
+    draw_text(text, style) {
+        _assertClass(style, Style);
+        const ret = wasm.fontref_draw_text(this.ptr, passStringToWasm(text), WASM_VECTOR_LEN, style.ptr);
         return Image.__wrap(ret);
     }
 }
@@ -207,6 +215,38 @@ class Image {
     }
 }
 __exports.Image = Image;
+/**
+*/
+class Style {
+
+    static __wrap(ptr) {
+        const obj = Object.create(Style.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        wasm.__wbg_style_free(ptr);
+    }
+    /**
+    * @returns {Style}
+    */
+    constructor() {
+        const ret = wasm.style_new();
+        return Style.__wrap(ret);
+    }
+    /**
+    * @param {string} json
+    */
+    update(json) {
+        wasm.style_update(this.ptr, passStringToWasm(json), WASM_VECTOR_LEN);
+    }
+}
+__exports.Style = Style;
 
 function init(module) {
 

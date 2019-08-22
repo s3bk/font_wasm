@@ -21,6 +21,7 @@ init();
 function Context() {
     this.methods = {
         fonts: {},
+        styles: {},
         load_font: function(post, args) {
             let data = new Uint8Array(args.data);
             let t0 = performance.now();
@@ -31,8 +32,9 @@ function Context() {
         },
         draw_text: function(post, args) {
             let font = this.fonts[args.font_id];
+            let style = this.styles[args.style_id]
             let t0 = performance.now();
-            let image = font.draw_text(100, args.text);
+            let image = font.draw_text(args.text, style);
             let t1 = performance.now();
             let width = image.width();
             let height = image.height();
@@ -44,6 +46,14 @@ function Context() {
                 image: image_bitmap,
                 time: t1 - t0
             }, [image_bitmap]));
+        },
+        create_style: function(post, args) {
+            let style = new wasm_bindgen.Style();
+            this.styles[args.style_id] = style;
+        },
+        update_style: function(post, args) {
+            let style = this.styles[args.style_id];
+            style.update(args.json);
         }
     };
     this.onmessage = function(e) {
