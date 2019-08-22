@@ -2,7 +2,7 @@ let worker = new Worker('worker.js');
 let running = {};
 let job_nr = 0;
 
-function run(method, args, callback) {
+function run(method, args, callback, transfer) {
     let id = job_nr;
     job_nr += 1;
     
@@ -13,17 +13,19 @@ function run(method, args, callback) {
         id: id,
         method: method,
         args: args
-    });
+    }, transfer);
 }
 worker.onmessage = function(e) {
     let msg = e.data;
-    console.log(msg);
     let id = msg.id;
+    let data = msg.data;
+    
+    console.log(id, data);
     let callback = running[id];
     delete running[id];
     
     if (callback != undefined) {
-        callback(msg.data);
+        callback(data);
     }
 }
 
@@ -42,9 +44,9 @@ async function load_font_from_url(url) {
 function load_font(data, font_id) {
     let div = document.createElement("div");
     
-    run("load_font", {font_id: font_id, data: data});
-    run("draw_text", {font_id: font_id, text: TEXT}, function(image) {
-        div.appendChild(image2canvas(image));
+    run("load_font", {font_id: font_id, data: data}, null, [data]);
+    run("draw_text", {font_id: font_id, text: TEXT}, function(data) {
+        div.appendChild(image2canvas(data.image));
         
         let label = document.createElement("span");
         label.appendChild(document.createTextNode(font_id));
@@ -62,9 +64,9 @@ function load_font(data, font_id) {
 function update_text(e) {
     TEXT = e.target.value;
     ENTRIES.forEach(function(entry) {
-        run("draw_text", {font_id: entry.font_id, text: TEXT}, function(image) {
+        run("draw_text", {font_id: entry.font_id, text: TEXT}, function(data) {
             let div = entry.div;
-            div.replaceChild(image2canvas(image), div.firstChild);
+            div.replaceChild(image2canvas(data.image), div.firstChild);
         });
     });
 }

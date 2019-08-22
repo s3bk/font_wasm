@@ -22,24 +22,32 @@ function Context() {
     this.methods = {
         fonts: {},
         load_font: function(post, args) {
-            let font = new wasm_bindgen.FontRef(new Uint8Array(args.data));
+            let data = new Uint8Array(args.data);
+            let t0 = performance.now();
+            let font = new wasm_bindgen.FontRef(data);
+            let t1 = performance.now();
             this.fonts[args.font_id] = font;
+            post({time: t1 - t0});
         },
         draw_text: function(post, args) {
             let font = this.fonts[args.font_id];
+            let t0 = performance.now();
             let image = font.draw_text(100, args.text);
+            let t1 = performance.now();
             let width = image.width();
             let height = image.height();
             let array = new Uint8ClampedArray(4 * width * height);
             image.write_rgba_to(array);
             var img_data = new ImageData(array, width, height);
             createImageBitmap(img_data)
-            .then(image_bitmap => post(image_bitmap, [image_bitmap]));
+            .then(image_bitmap => post({
+                image: image_bitmap,
+                time: t1 - t0
+            }, [image_bitmap]));
         }
     };
     this.onmessage = function(e) {
         let msg = e.data;
-        console.log(msg);
         let id = msg.id;
         let fn = msg.method;
         let args = msg.args;
