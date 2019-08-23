@@ -135,21 +135,21 @@ var settings;
 function init_dat() {
     settings = new TextSettings();
     var gui = new dat.GUI();
-    gui.add(settings, "font_size", 1, 1000).onChange(update_style);
+    gui.add(settings, "font_size", 1, 1000).onFinishChange(update_style);
     
     function add_fill(name, obj) {
         var g = gui.addFolder(name);
-        g.add(obj, "enabled").onChange(update_style);
-        g.addColor(obj, "color").onChange(update_style);
-        g.add(obj, "opacity", 0., 1.).onChange(update_style);
+        g.add(obj, "enabled").onFinishChange(update_style);
+        g.addColor(obj, "color").onFinishChange(update_style);
+        g.add(obj, "opacity", 0., 1.).onFinishChange(update_style);
     }
         
     function add_stroke(name, obj) {
         var g = gui.addFolder(name);
-        g.add(obj, "enabled").onChange(update_style);
-        g.addColor(obj, "color").onChange(update_style);
-        g.add(obj, "opacity", 0., 1.).onChange(update_style);
-        g.add(obj, "width", 0.1, 10.).onChange(update_style);
+        g.add(obj, "enabled").onFinishChange(update_style);
+        g.addColor(obj, "color").onFinishChange(update_style);
+        g.add(obj, "opacity", 0., 1.).onFinishChange(update_style);
+        g.add(obj, "width", 0.1, 10.).onFinishChange(update_style);
     }
     
     add_fill("glyph fill", settings.fill);
