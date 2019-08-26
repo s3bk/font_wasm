@@ -19,10 +19,10 @@ async function init() {
 init();
 
 function Context() {
+    this.fonts = {};
+    this.styles = {};
     this.methods = {
-        fonts: {},
-        styles: {},
-        load_font: function(post, args) {
+        load_font: (post, args) => {
             let data = new Uint8Array(args.data);
             let t0 = performance.now();
             let font = new wasm_bindgen.FontRef(data);
@@ -30,7 +30,7 @@ function Context() {
             this.fonts[args.font_id] = font;
             post({time: t1 - t0});
         },
-        draw_text: function(post, args) {
+        draw_text: (post, args) => {
             let font = this.fonts[args.font_id];
             let style = this.styles[args.style_id]
             let t0 = performance.now();
@@ -47,7 +47,7 @@ function Context() {
                 time: t1 - t0
             }, [image_bitmap]));
         },
-        create_style: function(post, args) {
+        create_style: (post, args) => {
             let style = new wasm_bindgen.Style(args.json);
             this.styles[args.style_id] = style;
         },
