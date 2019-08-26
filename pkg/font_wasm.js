@@ -110,10 +110,6 @@ function takeObject(idx) {
     return ret;
 }
 
-function getArrayU8FromWasm(ptr, len) {
-    return getUint8Memory().subarray(ptr / 1, ptr / 1 + len);
-}
-
 function addHeapObject(obj) {
     if (heap_next === heap.length) heap.push(heap.length + 1);
     const idx = heap_next;
@@ -131,6 +127,10 @@ let cachedTextDecoder = new TextDecoder('utf-8');
 
 function getStringFromWasm(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
+}
+
+function getArrayU8FromWasm(ptr, len) {
+    return getUint8Memory().subarray(ptr / 1, ptr / 1 + len);
 }
 /**
 */
@@ -251,12 +251,6 @@ function init(module) {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
-    imports.wbg.__wbg_randomFillSync_4c0eae1b99ed88f0 = function(arg0, arg1, arg2) {
-        getObject(arg0).randomFillSync(getArrayU8FromWasm(arg1, arg2));
-    };
-    imports.wbg.__wbg_getRandomValues_d2d716c4a01068d2 = function(arg0, arg1, arg2) {
-        getObject(arg0).getRandomValues(getArrayU8FromWasm(arg1, arg2));
-    };
     imports.wbg.__wbg_self_5aab2143078661ea = function() {
         try {
             const ret = self.self;
@@ -280,6 +274,12 @@ function init(module) {
     imports.wbg.__wbg_getRandomValues_bda9b45cd5361a25 = function(arg0) {
         const ret = getObject(arg0).getRandomValues;
         return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getRandomValues_d2d716c4a01068d2 = function(arg0, arg1, arg2) {
+        getObject(arg0).getRandomValues(getArrayU8FromWasm(arg1, arg2));
+    };
+    imports.wbg.__wbg_randomFillSync_4c0eae1b99ed88f0 = function(arg0, arg1, arg2) {
+        getObject(arg0).randomFillSync(getArrayU8FromWasm(arg1, arg2));
     };
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm(arg0, arg1));
