@@ -9,4 +9,8 @@
   <p>Text: <input type="text" onchange="update_text(event)"/></p>
   <script type="text/javascript" src="index.js"></script></body>
   <div id="views"></div>
+  <form onsubmit="add_files(event)">
+    <input type="file" multiple="true" id="file-input"></input>
+    <input type="submit"></input>
+  </form>
 </html>

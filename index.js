@@ -110,6 +110,13 @@ function dragover_handler(e) {
 document.addEventListener("drop", drop_handler, false);
 document.addEventListener("dragover", dragover_handler, false);
 
+function add_files(event) {
+    event.preventDefault();
+    let e = document.getElementById("file-input");
+    add_fonts(e.files);
+    e.value = "";
+}
+
 var TextSettings = function() {
     this.font_size = 100.;
     this.fill = {
