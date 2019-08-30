@@ -51,6 +51,24 @@ function Context() {
             let style = new wasm_bindgen.Style(args.json);
             this.styles[args.style_id] = style;
         },
+        load_and_draw: (post, args) => {
+            let data = new Uint8Array(args.font_data);
+            let t0 = performance.now();
+            let font = new wasm_bindgen.FontRef(data);
+            let style = this.styles[args.style_id];
+            let image = font.draw_text(args.text, style);
+            let t1 = performance.now();
+            let width = image.width();
+            let height = image.height();
+            let array = new Uint8ClampedArray(4 * width * height);
+            image.write_rgba_to(array);
+            var img_data = new ImageData(array, width, height);
+            createImageBitmap(img_data)
+            .then(image_bitmap => post({
+                image: image_bitmap,
+                time: t1 - t0
+            }, [image_bitmap]));
+        }
     };
     this.onmessage = function(e) {
         let msg = e.data;

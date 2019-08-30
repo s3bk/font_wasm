@@ -78,6 +78,29 @@ function update_all() {
         });
     });
 }
+
+async function render_list(url) {
+    let response = await fetch(url);
+    let text = await response.text();
+    let views = document.getElementById("views");
+    for (const url of text.split("\n")) {
+        let div = document.createElement("div");
+        views.append(div);
+        let response = await fetch(url);
+        let data = await response.arrayBuffer();
+        run("load_and_draw", {
+            font_data: data,
+            style_id: STYLE,
+            text: TEXT
+        }, function(data) {
+            div.appendChild(image2canvas(data.image));
+            
+            let label = document.createElement("span");
+            label.appendChild(document.createTextNode(url));
+            div.appendChild(label);
+        });
+    }
+}
         
 function image2canvas(image) {
     let canvas = document.createElement("canvas");
