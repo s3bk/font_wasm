@@ -43,20 +43,26 @@ async function load_font_from_url(url) {
 
 function load_font(data, font_id) {
     let div = document.createElement("div");
-    
-    run("load_font", {font_id: font_id, data: data}, null, [data]);
-    run("draw_text", {font_id: font_id, text: TEXT, style_id: STYLE}, function(data) {
-        div.appendChild(image2canvas(data.image));
-        
-        let label = document.createElement("span");
-        label.appendChild(document.createTextNode(font_id));
-        div.appendChild(label);
-    });
+    let close = document.createElement("span");
+    close.appendChild(document.createTextNode("x"));
+    close.addEventListener("click", function() { div.parentElement.removeChild(div); }, false);
+    div.appendChild(close);
     
     let entry = {
         font_id: font_id,
         div: div
     };
+
+    run("load_font", {font_id: font_id, data: data}, null, [data]);
+    run("draw_text", {font_id: font_id, text: TEXT, style_id: STYLE}, function(data) {
+        let canvas = image2canvas(data.image);
+        div.appendChild(canvas);
+        entry.canvas = canvas;
+        let label = document.createElement("span");
+        label.appendChild(document.createTextNode(font_id));
+        div.appendChild(label);
+    });
+    
     document.getElementById("views").append(div);
     ENTRIES.push(entry);
 }
@@ -74,7 +80,9 @@ function update_all() {
         },
         function(data) {
             let div = entry.div;
-            div.replaceChild(image2canvas(data.image), div.firstChild);
+            let canvas = image2canvas(data.image);
+            div.replaceChild(canvas, entry.canvas);
+            entry.canvas = canvas;
         });
     });
 }
